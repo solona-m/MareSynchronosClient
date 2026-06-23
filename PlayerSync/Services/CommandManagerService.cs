@@ -31,7 +31,6 @@ public sealed class CommandManagerService : IDisposable
     private readonly CacheMonitor _cacheMonitor;
     private readonly ServerConfigurationManager _serverConfigurationManager;
     private readonly ZoneSyncConfigService _zoneSyncConfigService;
-    private readonly DeferredDrawService _deferredDraw;
     private readonly FileDialogManager _fileDialogManager;
     private readonly IpcManager _ipcManager;
     private readonly FileCacheManager _fileCacheManager;
@@ -59,7 +58,6 @@ public sealed class CommandManagerService : IDisposable
         MareMediator mediator,
         MareConfigService mareConfigService,
         ZoneSyncConfigService zoneSyncConfigService,
-        DeferredDrawService deferredDraw,
         FileDialogManager fileDialogManager,
         IpcManager ipcManager,
         FileCacheManager fileCacheManager,
@@ -75,7 +73,6 @@ public sealed class CommandManagerService : IDisposable
         _mediator = mediator;
         _mareConfigService = mareConfigService;
         _zoneSyncConfigService = zoneSyncConfigService;
-        _deferredDraw = deferredDraw;
         _fileDialogManager = fileDialogManager;
         _ipcManager = ipcManager;
         _fileCacheManager = fileCacheManager;
@@ -331,11 +328,11 @@ public sealed class CommandManagerService : IDisposable
                 return;
             }
             var startDir = _ipcManager.Penumbra.ModDirectory;
-            _deferredDraw.Enqueue(() => _fileDialogManager.OpenFileDialog("Select Penumbra Group JSON", ".json", (ok, paths) =>
+            _fileDialogManager.OpenFileDialog("Select Penumbra Group JSON", ".json", (ok, paths) =>
             {
                 if (!ok || paths.FirstOrDefault() is not string path) return;
                 _ = Task.Run(() => PreloadPlaylistAsync(path));
-            }, 1, string.IsNullOrEmpty(startDir) ? null : startDir));
+            }, 1, string.IsNullOrEmpty(startDir) ? null : startDir);
         }
     }
 

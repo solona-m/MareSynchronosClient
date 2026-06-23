@@ -96,7 +96,6 @@ public sealed class Plugin : IDalamudPlugin
         {
             collection.AddSingleton(new WindowSystem("PlayerSync"));
             collection.AddSingleton<FileDialogManager>();
-            collection.AddSingleton<DeferredDrawService>();
             collection.AddSingleton(new Dalamud.Localization("PlayerSync.Localization.", "", useEmbedded: true));
 
             collection.AddSingleton<IDataManager>(gameData);
@@ -263,12 +262,10 @@ public sealed class Plugin : IDalamudPlugin
             collection.AddScoped((s) => new UiService(s.GetRequiredService<ILogger<UiService>>(), pluginInterface.UiBuilder, s.GetRequiredService<MareConfigService>(),
                 s.GetRequiredService<WindowSystem>(), s.GetServices<WindowMediatorSubscriberBase>(),
                 s.GetRequiredService<UiFactory>(),
-                s.GetRequiredService<FileDialogManager>(), s.GetRequiredService<MareMediator>(),
-                s.GetRequiredService<DeferredDrawService>()));
+                s.GetRequiredService<FileDialogManager>(), s.GetRequiredService<MareMediator>()));
             collection.AddScoped((s) => new CommandManagerService(commandManager, s.GetRequiredService<PerformanceCollectorService>(),
                 s.GetRequiredService<ServerConfigurationManager>(), s.GetRequiredService<CacheMonitor>(), s.GetRequiredService<ApiController>(),
                 s.GetRequiredService<MareMediator>(), s.GetRequiredService<MareConfigService>(), s.GetRequiredService<ZoneSyncConfigService>(),
-                s.GetRequiredService<DeferredDrawService>(),
                 s.GetRequiredService<FileDialogManager>(), s.GetRequiredService<IpcManager>(),
                 s.GetRequiredService<FileCacheManager>(), s.GetRequiredService<FileUploadManager>(),
                 chatGui, pluginLog));
