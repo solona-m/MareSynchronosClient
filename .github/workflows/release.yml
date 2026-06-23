@@ -36,3 +36,14 @@ jobs:
           files: |
             PlayerSync/bin/x64/Release/MareSempiterne/latest.zip
             PlayerSync/bin/x64/Release/MareSempiterne/MareSempiterne.json
+      - name: Notify plugins repo
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          PLUGINS_REPO_TOKEN: ${{ secrets.PLUGINS_REPO_TOKEN }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          curl -sSf -X POST \
+            -H "Authorization: Bearer $PLUGINS_REPO_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/solona-m/plugins/dispatches \
+            -d "{\"event_type\":\"plugin-released\",\"client_payload\":{\"plugin\":\"MareSempiterne\",\"version\":\"$version\"}}"
