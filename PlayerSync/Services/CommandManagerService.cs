@@ -327,10 +327,19 @@ public sealed class CommandManagerService : IDisposable
                 _chat.PrintError("[PlayerSync] Not connected to server.");
                 return;
             }
-            var startDir = _ipcManager.Penumbra.ModDirectory;
+            var savedDir = _mareConfigService.Current.LastPreloadPlaylistFolder;
+            var startDir = !string.IsNullOrEmpty(savedDir) && Directory.Exists(savedDir)
+                ? savedDir
+                : _ipcManager.Penumbra.ModDirectory;
             _fileDialogManager.OpenFileDialog("Select Penumbra Group JSON", ".json", (ok, paths) =>
             {
                 if (!ok || paths.FirstOrDefault() is not string path) return;
+                var dir = Path.GetDirectoryName(path);
+                if (!string.IsNullOrEmpty(dir))
+                {
+                    _mareConfigService.Current.LastPreloadPlaylistFolder = dir;
+                    _mareConfigService.Save();
+                }
                 _ = Task.Run(() => PreloadPlaylistAsync(path));
             }, 1, string.IsNullOrEmpty(startDir) ? null : startDir);
         }
