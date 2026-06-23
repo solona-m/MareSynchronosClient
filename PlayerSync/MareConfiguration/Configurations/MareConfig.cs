@@ -112,7 +112,6 @@ public class MareConfig : IMareConfiguration
     public bool ShowProfileIconByNames { get; set; } = true;
     public bool SoftTargetPairsOnHover { get; set; } = false;
     public bool EnableValidationChecks { get; set; } = true;
-    public bool EnableAnimationCrashGuard { get; set; } = true;
     public bool EnableColorWaveNotification { get; set; } = true;
     public NotificationLocation PairRequestNotification { get; set; } = NotificationLocation.Both;
     public bool LifestreamInvitesDirectPairsOnly { get; set; } = false;

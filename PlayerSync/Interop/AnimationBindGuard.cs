@@ -86,8 +86,7 @@ public sealed class AnimationBindGuard : IHostedService, IDisposable
         try
         {
             gameInterop.InitializeFromAttributes(this);
-            if (_logger.IsEnabled(LogLevel.Information))
-                _logger.LogInformation("AnimationBindGuard: hook resolved at 0x{addr:X}.", _hook!.Address);
+            _logger.LogInformation("AnimationBindGuard: hook resolved at 0x{addr:X}.", _hook!.Address);
         }
         catch (Exception ex)
         {
@@ -114,7 +113,7 @@ public sealed class AnimationBindGuard : IHostedService, IDisposable
     {
         // Only intervene on the would-crash null case, and only when the guard is enabled (so it can be
         // A/B toggled live). Everything else takes the original path unchanged.
-        if (arg1 == nint.Zero && _configService.Current.EnableAnimationCrashGuard)
+        if (arg1 == nint.Zero)
         {
             // Rate-limited because this can fire many times per frame during a synchronized redraw.
             _caughtCount++;
