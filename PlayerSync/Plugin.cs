@@ -268,6 +268,7 @@ public sealed class Plugin : IDalamudPlugin
                 s.GetRequiredService<MareMediator>(), s.GetRequiredService<MareConfigService>(), s.GetRequiredService<ZoneSyncConfigService>(),
                 s.GetRequiredService<FileDialogManager>(), s.GetRequiredService<IpcManager>(),
                 s.GetRequiredService<FileCacheManager>(), s.GetRequiredService<FileUploadManager>(),
+                s.GetRequiredService<DalamudUtilService>(),
                 chatGui, pluginLog));
             collection.AddScoped((s) => new UiSharedService(s.GetRequiredService<ILogger<UiSharedService>>(), s.GetRequiredService<IpcManager>(), s.GetRequiredService<ApiController>(),
                 s.GetRequiredService<CacheMonitor>(), s.GetRequiredService<FileDialogManager>(), s.GetRequiredService<MareConfigService>(), s.GetRequiredService<DalamudUtilService>(),
