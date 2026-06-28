@@ -137,6 +137,7 @@ public sealed class Plugin : IDalamudPlugin
             collection.AddSingleton(s => new VfxSpawnManager(s.GetRequiredService<ILogger<VfxSpawnManager>>(),
                 gameInteropProvider, s.GetRequiredService<MareMediator>()));
             collection.AddSingleton((s) => new BlockedCharacterHandler(s.GetRequiredService<ILogger<BlockedCharacterHandler>>(), gameInteropProvider));
+            collection.AddSingleton((s) => new AnimationBindGuard(s.GetRequiredService<ILogger<AnimationBindGuard>>(), gameInteropProvider, s.GetRequiredService<MareConfigService>()));
             collection.AddSingleton((s) => new IpcProvider(s.GetRequiredService<ILogger<IpcProvider>>(),
                 pluginInterface,
                 s.GetRequiredService<CharaDataManager>(),
@@ -264,7 +265,11 @@ public sealed class Plugin : IDalamudPlugin
                 s.GetRequiredService<FileDialogManager>(), s.GetRequiredService<MareMediator>()));
             collection.AddScoped((s) => new CommandManagerService(commandManager, s.GetRequiredService<PerformanceCollectorService>(),
                 s.GetRequiredService<ServerConfigurationManager>(), s.GetRequiredService<CacheMonitor>(), s.GetRequiredService<ApiController>(),
-                s.GetRequiredService<MareMediator>(), s.GetRequiredService<MareConfigService>(), s.GetRequiredService<ZoneSyncConfigService>(), chatGui, pluginLog));
+                s.GetRequiredService<MareMediator>(), s.GetRequiredService<MareConfigService>(), s.GetRequiredService<ZoneSyncConfigService>(),
+                s.GetRequiredService<FileDialogManager>(), s.GetRequiredService<IpcManager>(),
+                s.GetRequiredService<FileCacheManager>(), s.GetRequiredService<FileUploadManager>(),
+                s.GetRequiredService<DalamudUtilService>(),
+                chatGui, pluginLog));
             collection.AddScoped((s) => new UiSharedService(s.GetRequiredService<ILogger<UiSharedService>>(), s.GetRequiredService<IpcManager>(), s.GetRequiredService<ApiController>(),
                 s.GetRequiredService<CacheMonitor>(), s.GetRequiredService<FileDialogManager>(), s.GetRequiredService<MareConfigService>(), s.GetRequiredService<DalamudUtilService>(),
                 pluginInterface, textureProvider, s.GetRequiredService<Dalamud.Localization>(), s.GetRequiredService<ServerConfigurationManager>(), s.GetRequiredService<TokenProvider>(),
@@ -286,6 +291,7 @@ public sealed class Plugin : IDalamudPlugin
             collection.AddHostedService(p => p.GetRequiredService<EmoteSyncManagerService>());
             collection.AddHostedService(p => p.GetRequiredService<PairContextMenuHandler>());
             collection.AddHostedService(p => p.GetRequiredService<JsonDataTypeHandlerService>());
+            collection.AddHostedService(p => p.GetRequiredService<AnimationBindGuard>());
         })
         .Build();
 

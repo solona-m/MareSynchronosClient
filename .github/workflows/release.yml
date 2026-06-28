@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags: [ "v*" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Download Dalamud binaries
+        run: curl --output /home/runner/dalamud-distrib.zip -L "https://github.com/goatcorp/dalamud-distrib/raw/refs/heads/main/latest.zip"
+      - name: Extract Dalamud binaries
+        run: mkdir -p /home/runner/.xlcore/dalamud/Hooks/dev && unzip /home/runner/dalamud-distrib.zip -d /home/runner/.xlcore/dalamud/Hooks/dev
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+        env:
+          DALAMUD_HOME: /home/runner/.xlcore/dalamud/Hooks/dev
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            PlayerSync/bin/x64/Release/MareSempiterne/latest.zip
+            PlayerSync/bin/x64/Release/MareSempiterne/MareSempiterne.json
+      - name: Notify plugins repo
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          PLUGINS_REPO_TOKEN: ${{ secrets.PLUGINS_REPO_TOKEN }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          curl -sSf -X POST \
+            -H "Authorization: Bearer $PLUGINS_REPO_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/solona-m/plugins/dispatches \
+            -d "{\"event_type\":\"plugin-released\",\"client_payload\":{\"plugin\":\"MareSempiterne\",\"version\":\"$version\"}}"
