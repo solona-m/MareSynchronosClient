@@ -18,7 +18,7 @@ public static class TmbValidation
 
     public static readonly ValidationMessage TMB002A = new ValidationMessage(nameof(TMB002A), "TMB C002 path empty", "The TMB file has a TMB entry (C002) whose Path is empty.", MessageLevel.Crash);
     public static readonly ValidationMessage TMB002B = new ValidationMessage(nameof(TMB002B), "TMB C002 path invalid", "The TMB file has a TMB entry (C002) whose Path is invalid.", MessageLevel.Crash);
-    public static readonly ValidationMessage TMB002C = new ValidationMessage(nameof(TMB002C), "TMB C002 path missing", "The TMB file has a TMB entry (C002) whose Path refers to a resource that cannot be found.", MessageLevel.Warning);
+    public static readonly ValidationMessage TMB002C = new ValidationMessage(nameof(TMB002C), "TMB C002 path missing", "The TMB file has a TMB entry (C002) whose Path refers to a resource that cannot be found.", MessageLevel.Crash);
 
     public static readonly ValidationMessage TMB009A = new ValidationMessage(nameof(TMB009A), "TMB C009 path empty", "The TMB file has an Animation (PAP) entry (C009) whose Path is empty.", MessageLevel.Warning);
     public static readonly ValidationMessage TMB009B = new ValidationMessage(nameof(TMB009B), "TMB C009 path invalid", "The TMB file has an Animation (PAP) entry (C009) whose Path is invalid.", MessageLevel.Warning);
@@ -28,7 +28,7 @@ public static class TmbValidation
 
     public static readonly ValidationMessage TMB012A = new ValidationMessage(nameof(TMB012A), "TMB C012 path empty", "The TMB file has a VFX entry (C012) whose Path is empty.", MessageLevel.Crash);
     public static readonly ValidationMessage TMB012B = new ValidationMessage(nameof(TMB012B), "TMB C012 path invalid", "The TMB file has a VFX entry (C012) whose Path is invalid.", MessageLevel.Crash);
-    public static readonly ValidationMessage TMB012C = new ValidationMessage(nameof(TMB012C), "TMB C012 path missing", "The TMB file has a VFX entry (C012) whose Path refers to a resource that cannot be found.", MessageLevel.Warning);
+    public static readonly ValidationMessage TMB012C = new ValidationMessage(nameof(TMB012C), "TMB C012 path missing", "The TMB file has a VFX entry (C012) whose Path refers to a resource that cannot be found.", MessageLevel.Crash);
 
     public static readonly ValidationMessage TMB063A = new ValidationMessage(nameof(TMB063A), "TMB C063 path empty", "The TMB file has an Audio entry (C063) whose Path is empty.", MessageLevel.Warning);
     public static readonly ValidationMessage TMB063B = new ValidationMessage(nameof(TMB063B), "TMB C063 path invalid", "The TMB file has an Audio entry (C063) whose path is invalid.", MessageLevel.Crash);
@@ -36,7 +36,7 @@ public static class TmbValidation
 
     public static readonly ValidationMessage TMB173A = new ValidationMessage(nameof(TMB173A), "TMB C173 path empty", "The TMB file has an Async VFX entry (C173) whose Path is empty.", MessageLevel.Crash);
     public static readonly ValidationMessage TMB173B = new ValidationMessage(nameof(TMB173B), "TMB C173 path invalid", "The TMB file has an Async VFX entry (C173) whose Path is invalid.", MessageLevel.Crash);
-    public static readonly ValidationMessage TMB173C = new ValidationMessage(nameof(TMB173C), "TMB C173 path missing", "The TMB file has an Async VFX entry (C173) whose Path refers to a resource that cannot be found.", MessageLevel.Warning);
+    public static readonly ValidationMessage TMB173C = new ValidationMessage(nameof(TMB173C), "TMB C173 path missing", "The TMB file has an Async VFX entry (C173) whose Path refers to a resource that cannot be found.", MessageLevel.Crash);
 
     public static IEnumerable<ValidationMessage> ValidateTmbFile(ExcelModule excelModule, byte[] fileData, Func<string, bool>? validatePath)
     {
