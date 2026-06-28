@@ -1,5 +1,6 @@
 ﻿using Dalamud.Plugin;
 using Lumina.Excel;
+using PlayerSync.Validation.Pap;
 using PlayerSync.Validation.Tmb;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,11 @@ public static class FileValidation
             || (fileData.Length >= sizeof(uint) && MemoryMarshal.Read<uint>(fileData) == TmbValidation.TmbMagic))
         {
             return TmbValidation.ValidateTmbFile(excelModule, fileData, validatePath);
+        }
+        else if (extension.Equals(".pap", StringComparison.OrdinalIgnoreCase)
+            || (fileData.Length >= sizeof(uint) && MemoryMarshal.Read<uint>(fileData) == PapValidation.PapMagic))
+        {
+            return PapValidation.ValidatePapFile(excelModule, fileData, validatePath);
         }
         else
         {

@@ -81,11 +81,10 @@ public static class ValidationUtils
     /// <returns>True if the game should be able to parse the given string as a game path without crashing.</returns>
     public static bool IsPathParseable(string path, bool validateExtension)
     {
-        // Path must have only "a-zA-Z0-9_-. "
         for (int i = 0; i < path.Length; i++)
         {
             var ch = path[i];
-            if (!char.IsAsciiLetterOrDigit(ch) && ch != '/' && ch != '_' && ch != '.' && ch != '-' && ch != ' ')
+            if (ch < 0x20 || ch > 0x7E)
             {
                 return false;
             }
