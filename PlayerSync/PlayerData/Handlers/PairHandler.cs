@@ -531,7 +531,7 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
                         }
                         catch (InvalidOperationException ex)
                         {
-                            Logger.LogWarning(ex, "Failed disposing player (not present anymore?)");
+                            Logger.LogInformation(ex, "Failed disposing player (not present anymore?)");
                             break;
                         }
                     }
@@ -841,7 +841,11 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
 
                             if (validationMessages.Any(message => message.Level == MessageLevel.Crash))
                             {
-                                Logger.LogWarning("{uid} ({name}): File {hash} to be used as {gamePath} looks like it could crash game and will be ignored. \n  {description}", Pair.UserData.UID, PlayerName, file.Key.Hash, file.Key.GamePath, messageString);
+                                var crashMessages = validationMessages.Where(m => m.Level == MessageLevel.Crash);
+                                if (crashMessages.Any(m => m.ID.StartsWith("PAP", StringComparison.Ordinal)))
+                                    Logger.LogWarning("{uid} ({name}): File {hash} to be used as {gamePath} looks like it could crash game and will be ignored. \n  {description}", Pair.UserData.UID, PlayerName, file.Key.Hash, file.Key.GamePath, messageString);
+                                else
+                                    Logger.LogInformation("{uid} ({name}): File {hash} to be used as {gamePath} looks like it could crash game and will be ignored. \n  {description}", Pair.UserData.UID, PlayerName, file.Key.Hash, file.Key.GamePath, messageString);
                                 moddedPaths.Remove(file.Key);
                             }
                             else
@@ -918,7 +922,7 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
             }
             else
             {
-                Logger.LogWarning(ex, "[{applicationId}] Cancelled", _applicationId);
+                Logger.LogInformation(ex, "[{applicationId}] Cancelled", _applicationId);
             }
         }
         finally
