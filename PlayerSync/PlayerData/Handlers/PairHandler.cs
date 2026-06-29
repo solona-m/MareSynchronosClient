@@ -842,7 +842,7 @@ public sealed class PairHandler : DisposableMediatorSubscriberBase
                             if (validationMessages.Any(message => message.Level == MessageLevel.Crash))
                             {
                                 var crashMessages = validationMessages.Where(m => m.Level == MessageLevel.Crash);
-                                if (crashMessages.Any(m => m.ID.StartsWith("PAP", StringComparison.Ordinal)))
+                                if (crashMessages.Any(m => m.ID.StartsWith("PAP", StringComparison.Ordinal) || m.ID.StartsWith("MTRL", StringComparison.Ordinal)))
                                     Logger.LogWarning("{uid} ({name}): File {hash} to be used as {gamePath} looks like it could crash game and will be ignored. \n  {description}", Pair.UserData.UID, PlayerName, file.Key.Hash, file.Key.GamePath, messageString);
                                 else
                                     Logger.LogInformation("{uid} ({name}): File {hash} to be used as {gamePath} looks like it could crash game and will be ignored. \n  {description}", Pair.UserData.UID, PlayerName, file.Key.Hash, file.Key.GamePath, messageString);
