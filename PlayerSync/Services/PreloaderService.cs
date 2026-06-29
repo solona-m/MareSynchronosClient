@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace MareSynchronos.Services;
 
-internal sealed class Preloader
+public sealed class PreloaderService
 {
     private readonly FileCacheManager _fileCacheManager;
     private readonly FileUploadManager _fileUploadManager;
@@ -19,7 +19,7 @@ internal sealed class Preloader
     private sealed record PenumbraGroup(
         [property: JsonPropertyName("Options")] List<PenumbraOption>? Options);
 
-    public Preloader(
+    public PreloaderService(
         FileCacheManager fileCacheManager,
         FileUploadManager fileUploadManager,
         DalamudUtilService dalamudUtil,

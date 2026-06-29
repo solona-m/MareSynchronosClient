@@ -1,6 +1,4 @@
-﻿using Dalamud.Game.Command;
-using MareSynchronos.Interop.Ipc;
-using Dalamud.Interface.ImGuiFileDialog;
+using Dalamud.Game.Command;
 using Dalamud.Plugin.Services;
 using MareSynchronos.FileCache;
 using MareSynchronos.MareConfiguration;
@@ -9,10 +7,9 @@ using MareSynchronos.Services.Mediator;
 using MareSynchronos.Services.ServerConfiguration;
 using MareSynchronos.UI;
 using MareSynchronos.WebAPI;
-using MareSynchronos.WebAPI.Files;
+using MareSynchronos.Utils;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using MareSynchronos.Utils;
 
 namespace MareSynchronos.Services;
 
@@ -29,9 +26,6 @@ public sealed class CommandManagerService : IDisposable
     private readonly CacheMonitor _cacheMonitor;
     private readonly ServerConfigurationManager _serverConfigurationManager;
     private readonly ZoneSyncConfigService _zoneSyncConfigService;
-    private readonly FileDialogManager _fileDialogManager;
-    private readonly IpcManager _ipcManager;
-    private readonly Preloader _preloader;
 
     private readonly IChatGui _chat;
     private readonly IPluginLog _log;
@@ -50,11 +44,6 @@ public sealed class CommandManagerService : IDisposable
         MareMediator mediator,
         MareConfigService mareConfigService,
         ZoneSyncConfigService zoneSyncConfigService,
-        FileDialogManager fileDialogManager,
-        IpcManager ipcManager,
-        FileCacheManager fileCacheManager,
-        FileUploadManager fileUploadManager,
-        DalamudUtilService dalamudUtil,
         IChatGui chat,
         IPluginLog log)
     {
@@ -66,11 +55,8 @@ public sealed class CommandManagerService : IDisposable
         _mediator = mediator;
         _mareConfigService = mareConfigService;
         _zoneSyncConfigService = zoneSyncConfigService;
-        _fileDialogManager = fileDialogManager;
-        _ipcManager = ipcManager;
         _chat = chat;
         _log = log;
-        _preloader = new Preloader(fileCacheManager, fileUploadManager, dalamudUtil, chat, log);
 
         // 1) Try to register /sync first (primary).
         var syncHandler = new CommandInfo(OnCommand)
@@ -100,7 +86,7 @@ public sealed class CommandManagerService : IDisposable
 
         ActiveAlias = syncOk ? _commandName : _secondaryCommandName;
 
-        // So we can use this in a couple other chat printerrors 
+        // So we can use this in a couple other chat printerrors
         CommandAlias.Active = ActiveAlias;
 
         if (!psyncOk && !syncOk)
@@ -249,7 +235,6 @@ public sealed class CommandManagerService : IDisposable
         {
             _mediator.Publish(new UiToggleMessage(typeof(DataAnalysisUi)));
         }
-
         else if (string.Equals(splitArgs[0], "broadcast", StringComparison.OrdinalIgnoreCase))
         {
             bool originalStatus = _mareConfigService.Current.ListenForBroadcasts;
@@ -270,10 +255,8 @@ public sealed class CommandManagerService : IDisposable
                 _mediator.Publish(new BroadcastListeningChanged(_mareConfigService.Current.ListenForBroadcasts));
             }
             string status = _mareConfigService.Current.ListenForBroadcasts ? "on" : "off";
-            string chatMsg = $"[PlayerSync] Syncshell Broadcast feature is {status}.";
-            _chat.Print(chatMsg);
+            _chat.Print($"[PlayerSync] Syncshell Broadcast feature is {status}.");
         }
-
         else if (string.Equals(splitArgs[0], "zonesync", StringComparison.OrdinalIgnoreCase))
         {
             bool originalStatus = _zoneSyncConfigService.Current.EnableGroupZoneSyncJoining;
@@ -288,7 +271,7 @@ public sealed class CommandManagerService : IDisposable
                     _zoneSyncConfigService.Current.EnableGroupZoneSyncJoining = false;
             }
 
-            string status = "";
+            string status;
             if (originalStatus != _zoneSyncConfigService.Current.EnableGroupZoneSyncJoining)
             {
                 var character = _serverConfigurationManager.CurrentPlayerName;
@@ -302,38 +285,11 @@ public sealed class CommandManagerService : IDisposable
                 status = _zoneSyncConfigService.Current.EnableGroupZoneSyncJoining ? "on." : "off.";
             }
 
-            string chatMsg = $"[PlayerSync] ZoneSync feature is {status}";
-
-            _chat.Print(chatMsg);
+            _chat.Print($"[PlayerSync] ZoneSync feature is {status}");
         }
-
-
         else if (string.Equals(splitArgs[0], "settings", StringComparison.OrdinalIgnoreCase))
         {
             _mediator.Publish(new UiToggleMessage(typeof(SettingsUi)));
-        }
-        else if (string.Equals(splitArgs[0], "preloadplaylist", StringComparison.OrdinalIgnoreCase))
-        {
-            if (!_apiController.IsConnected)
-            {
-                _chat.PrintError("[PlayerSync] Not connected to server.");
-                return;
-            }
-            var savedDir = _mareConfigService.Current.LastPreloadPlaylistFolder;
-            var startDir = !string.IsNullOrEmpty(savedDir) && Directory.Exists(savedDir)
-                ? savedDir
-                : _ipcManager.Penumbra.ModDirectory;
-            _fileDialogManager.OpenFileDialog("Select Penumbra Group JSON", ".json", (ok, paths) =>
-            {
-                if (!ok || paths.FirstOrDefault() is not string path) return;
-                var dir = Path.GetDirectoryName(path);
-                if (!string.IsNullOrEmpty(dir))
-                {
-                    _mareConfigService.Current.LastPreloadPlaylistFolder = dir;
-                    _mareConfigService.Save();
-                }
-                _ = Task.Run(() => _preloader.RunAsync(path));
-            }, 1, string.IsNullOrEmpty(startDir) ? null : startDir);
         }
     }
 }
