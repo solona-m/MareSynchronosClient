@@ -44,35 +44,36 @@ internal sealed class Preloader
             var group = JsonSerializer.Deserialize<PenumbraGroup>(json);
 
             var modDir = Path.GetDirectoryName(jsonPath)!;
-            var filePaths = (group?.Options ?? [])
+            var scdPaths = (group?.Options ?? [])
                 .SelectMany(o => o.Files ?? [])
+                .Where(kv => kv.Value.EndsWith(".scd", StringComparison.OrdinalIgnoreCase))
                 .Select(kv => Path.Combine(modDir, kv.Value))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray();
 
-            if (filePaths.Length == 0)
+            if (scdPaths.Length == 0)
             {
-                await Print("[PlayerSync] No files found in that group.").ConfigureAwait(false);
+                await Print("[PlayerSync] No SCD files found in that group.").ConfigureAwait(false);
                 return;
             }
 
-            await Print($"[PlayerSync] Found {filePaths.Length} file(s), uploading...").ConfigureAwait(false);
+            await Print($"[PlayerSync] Found {scdPaths.Length} SCD file(s), uploading...").ConfigureAwait(false);
 
-            var cacheEntries = _fileCacheManager.GetFileCachesByPaths(filePaths);
+            var cacheEntries = _fileCacheManager.GetFileCachesByPaths(scdPaths);
             var hashes = cacheEntries.Values
                 .Where(e => e != null)
                 .Select(e => e!.Hash)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            // Files that never resolved to a cache entry (missing on disk, outside the
+            // SCDs that never resolved to a cache entry (missing on disk, outside the
             // Penumbra mod folder, etc.) can't be uploaded — count them as failures.
             var uncached = cacheEntries
                 .Where(kv => kv.Value == null)
                 .Select(kv => kv.Key)
                 .ToList();
 
-            var progress = new Progress<string>(msg => _log.Debug("[PreloadPlaylist] {msg}", msg));
+            var progress = new Progress<string>(msg => _log.Debug("[Preload] {msg}", msg));
             var failed = await _fileUploadManager.UploadFiles(hashes, progress).ConfigureAwait(false);
 
             var pushed = hashes.Count - failed.Count;
@@ -83,20 +84,20 @@ internal sealed class Preloader
                     kv.Value != null && string.Equals(kv.Value!.Hash, h, StringComparison.OrdinalIgnoreCase)).Key ?? h)
                 .Select(p => $"{Path.GetFileName(p)} (upload failed)");
 
-            // Uncached files never resolved to a cache entry and are already paths.
+            // Uncached SCDs never resolved to a cache entry and are already paths.
             var uncachedFailures = uncached
                 .Select(p => $"{Path.GetFileName(p)} (file missing)");
 
             var failedNames = uploadFailures.Concat(uncachedFailures).ToList();
 
-            await Print($"[PlayerSync] Preload done — {pushed} uploaded, {failedNames.Count} failed.").ConfigureAwait(false);
+            await Print($"[PlayerSync] SCD preload done — {pushed} uploaded, {failedNames.Count} failed.").ConfigureAwait(false);
             if (failedNames.Count > 0)
                 await PrintError($"[PlayerSync] Failed files: {string.Join(", ", failedNames)}").ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            _log.Error(ex, "PreloadPlaylist failed");
-            await PrintError($"[PlayerSync] Preload failed: {ex.Message}").ConfigureAwait(false);
+            _log.Error(ex, "Preload failed");
+            await PrintError($"[PlayerSync] preload failed: {ex.Message}").ConfigureAwait(false);
         }
     }
 }
