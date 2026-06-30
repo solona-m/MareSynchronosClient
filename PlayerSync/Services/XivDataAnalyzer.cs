@@ -187,7 +187,9 @@ public sealed class XivDataAnalyzer
         finally
         {
             if (resource != null)
+            {
                 ((hkReferencedObject*)resource)->RemoveReference();
+            }
             Marshal.FreeHGlobal(tempHavokDataPathAnsi);
             File.Delete(tempHavokDataPath);
         }
