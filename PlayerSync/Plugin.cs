@@ -138,6 +138,7 @@ public sealed class Plugin : IDalamudPlugin
                 gameInteropProvider, s.GetRequiredService<MareMediator>()));
             collection.AddSingleton((s) => new BlockedCharacterHandler(s.GetRequiredService<ILogger<BlockedCharacterHandler>>(), gameInteropProvider));
             collection.AddSingleton((s) => new AnimationBindGuard(s.GetRequiredService<ILogger<AnimationBindGuard>>(), gameInteropProvider, s.GetRequiredService<MareConfigService>()));
+            collection.AddSingleton((s) => new HavokAllocGuard(s.GetRequiredService<ILogger<HavokAllocGuard>>(), gameInteropProvider));
             collection.AddSingleton((s) => new IpcProvider(s.GetRequiredService<ILogger<IpcProvider>>(),
                 pluginInterface,
                 s.GetRequiredService<CharaDataManager>(),
