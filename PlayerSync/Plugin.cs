@@ -138,6 +138,10 @@ public sealed class Plugin : IDalamudPlugin
                 gameInteropProvider, s.GetRequiredService<MareMediator>()));
             collection.AddSingleton((s) => new BlockedCharacterHandler(s.GetRequiredService<ILogger<BlockedCharacterHandler>>(), gameInteropProvider));
             collection.AddSingleton((s) => new AnimationBindGuard(s.GetRequiredService<ILogger<AnimationBindGuard>>(), gameInteropProvider, s.GetRequiredService<MareConfigService>()));
+            collection.AddSingleton((s) => new HavokAllocGuard(s.GetRequiredService<ILogger<HavokAllocGuard>>(), gameInteropProvider));
+            collection.AddSingleton((s) => new HavokFreelistDiagnostic(s.GetRequiredService<ILogger<HavokFreelistDiagnostic>>(), gameInteropProvider, s.GetRequiredService<MareConfigService>()));
+            collection.AddSingleton((s) => new AnimationFreeGuard(s.GetRequiredService<ILogger<AnimationFreeGuard>>(), gameInteropProvider));
+            collection.AddSingleton((s) => new PapLeaf1StringGuard(s.GetRequiredService<ILogger<PapLeaf1StringGuard>>(), gameInteropProvider));
             collection.AddSingleton((s) => new IpcProvider(s.GetRequiredService<ILogger<IpcProvider>>(),
                 pluginInterface,
                 s.GetRequiredService<CharaDataManager>(),
@@ -292,6 +296,10 @@ public sealed class Plugin : IDalamudPlugin
             collection.AddHostedService(p => p.GetRequiredService<PairContextMenuHandler>());
             collection.AddHostedService(p => p.GetRequiredService<JsonDataTypeHandlerService>());
             collection.AddHostedService(p => p.GetRequiredService<AnimationBindGuard>());
+            collection.AddHostedService(p => p.GetRequiredService<HavokAllocGuard>());
+            collection.AddHostedService(p => p.GetRequiredService<HavokFreelistDiagnostic>());
+            collection.AddHostedService(p => p.GetRequiredService<AnimationFreeGuard>());
+            collection.AddHostedService(p => p.GetRequiredService<PapLeaf1StringGuard>());
         })
         .Build();
 
